@@ -1,0 +1,64 @@
+We construct a plugin X between Gremlin and backendStorage.
+
+1 1         示例语句   
+select * from ggraph('g.V().has(''citizenid'', ''428957201706101374'') ');
+
+ 
+
+2         函数调用堆栈   
+Thread[gremlin一serve-exec一8](suspended)
+三chemaTableTree·constructSelectSinglePathSql(
+三SchemaTabIeTree.constructSinglepathSql(SqlgGraph,boolea
+三SchemaTabIeTree.constructSinglepathSql(SqlgGraph,boolea
+三SchemaTableTree.constructsql(LinkedListschemaTableTree
+三SqIgsqlExecutor.executeRegularQuery(SqlgGraph,Schema毛
+三SqlgCompiledResultlterator<E>.executeRegularQuery()Iine:
+三SqlgCompiledResultlterator<e>.hasNextLazy()Iine:121
+三SqlgCompiledResultlterator<e>.hasNext()Iine:78
+三SqlgGraphstep<S,E>.processNextstart()Ilne:77
+三SqlgGraphstep<S,E>(Abstractstep<s,E>).hasNext()Iine:1
+三DefaultGraphTraversal<S,E>(DefaultTraversalS,E).hasNe
+三IteratorUtils.fill(Iteratort,S)}ine:62
+三IteratorUtils.list(lterators)}ine:85
+三IteratorUtils.asList(object)Ilne:382
+三HttpGremIinEndpointHandIer.lambda$channelRead$l(Timer￡
+三222357684.apply(Object)Iine:notavailable
+三FunctionUtils.lambda$WrapFunction$o（ThrowingFunction,obj.
+三2137945101.apply(Object)line:notavailable
+三GremlinExecutor.lambda$eval$0(GremlinExecutor$Lifecycle,
+
+
+ 3  constructSelectSinglePathSql()函数走读   
+ 
+3.1      构造string：singlePathSql   
+
+StringBuilder singlepathsql = new  stringBuilder(''\nSELECr\n\t'');
+
+3.2         获取SchemaTable 
+
+SchemaTableTree firstSchemaTableTree = distinctQueryStack.getFirst();
+SchemaTable firstScehmaTable = fisrtSchemaTableTree.getSchemaTable();
+
+3.3      添加index等信息  
+
+
+
+
+3.4      添加targetlist   
+
+
+其中，生成alias算法是在calculatedAliasId函数中调用rootAliasAndIncrement()函数完成
+
+先调用1513行的printIDFromClauseFor生成了public.V_citizen.ID
+
+然后调用1515行的printFromClauseFor生成了V_citizen其他列，该函数内部调用了calculateAliasPropertyName函数
+
+最后调用columnList的toString方法生成的select targetlist如下：
+
+3.5      添加from   
+
+3.6      添加where条件   
+
+4       finish   
+
+
