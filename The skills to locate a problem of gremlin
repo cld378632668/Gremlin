@@ -1,0 +1,60 @@
+1. explain功能   
+
+可以在gremlin语句末尾添加explain()，来查看strategy apply的效果，例如：
+
+mmdb=> select * from ggraph($$g.V().and().out('callphone').explain()$$,'sql');
+ERROR:  ----  Explain Mode  ----
+>>>>  Starting with: [GraphStep(vertex,[]), AndStep, VertexStep(OUT,[callphone],vertex)]
+----  Begin to apply strategies.  ----
+[GsReplaceStrategy          ]: [GraphStep(vertex,[]), AndStep, VertexStep(OUT,[callphone],vertex)]
+[GsRepeatExpandStrategy     ]: [GraphStep(vertex,[]), AndStep, VertexStep(OUT,[callphone],vertex)]
+[ConnectiveStrategy         ]: [GraphStep(vertex,[]), AndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[CountStrategy              ]: [GraphStep(vertex,[]), AndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsSkipStrategy             ]: [GraphStep(vertex,[]), AndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsMGTStrategy              ]: [GraphStep(vertex,[]), AndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsInlineFilterStrategy     ]: [GraphStep(vertex,[]), AndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsTraversalStrategy        ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsGraphStepStrategy        ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsPathStrategy             ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsPathFilterStrategy       ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsSelectStrategy           ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsGroupByAndOrderByStrategy]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsMoveHasStepStrategy      ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+[GsGroupCountStrategy       ]: [GsGraphStep(vertex,[]), GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])]
+----  Apply strategies to child traversals of GsGraphStep(vertex,[])  ----
+----  Apply strategies to child traversals of GsAndStep([[], [VertexStep(OUT,[callphone],vertex)]])  ----
+>>>>  Starting with: []
+<<<<  Ending with: []
+>>>>  Starting with: [VertexStep(OUT,[callphone],vertex)]
+[GsReplaceStrategy          ]: [VertexStep(OUT,[callphone],vertex)]
+[GsRepeatExpandStrategy     ]: [VertexStep(OUT,[callphone],vertex)]
+[ConnectiveStrategy         ]: [VertexStep(OUT,[callphone],vertex)]
+[CountStrategy              ]: [VertexStep(OUT,[callphone],vertex)]
+[GsSkipStrategy             ]: [VertexStep(OUT,[callphone],vertex)]
+[GsMGTStrategy              ]: [VertexStep(OUT,[callphone],vertex)]
+[GsInlineFilterStrategy     ]: [VertexStep(OUT,[callphone],vertex)]
+[GsTraversalStrategy        ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsGraphStepStrategy        ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsPathStrategy             ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsPathFilterStrategy       ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsSelectStrategy           ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsGroupByAndOrderByStrategy]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsMoveHasStepStrategy      ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+[GsGroupCountStrategy       ]: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+<<<<  Ending with: [GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]
+----  Finish applying strategies.  ----
+<<<<  Ending with: [GsGraphStep(vertex,[]), GsAndStep([[GsVertexStep(OUT,<a href="http://3ms.huawei.com/hi/index.php?app=group&mod=Wiki&act=goWiki&title=callphone&gid=3286791" target="_blank">callphone</a>,vertex)]])]
+
+
+2.打印debug日志   
+在XXDB中设置日志打印级别为debug（set log_min_messages=debug;），然后执行语句，在日志中会打印每个Step的QueryTree，MatchStep中间产生的MatchTree等信息，利用SQL引擎图形化工具可以进一步分析问题：
+
+
+打印GueryTree：
+在CN文件目录下找到postgresql.conf，将debug_print_parse 设为 on，重启数据库
+2.执行query，打印QueryTree到日志   
+执行Query，如果直接发送语句到DN，可以设置set enable_fast_query_shipping = off;
+
+在CN文件目录下的pg_log中找到最近的一个日志文件，在文件结尾找到形如下面的字段：
+
+
